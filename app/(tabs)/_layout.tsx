@@ -115,6 +115,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconWrapActive: {
-    backgroundColor: 'rgba(234,88,12,0.18)',
+    backgroundColor: 'rgba(194,65,12,0.16)',
   },
 });

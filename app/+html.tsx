@@ -10,7 +10,7 @@ export default function Root({ children }: PropsWithChildren) {
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="theme-color" content="#0B0C0F" />
+        <meta name="theme-color" content="#121316" />
 
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" />

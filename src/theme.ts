@@ -2,16 +2,16 @@ import type { ActivityMode } from './types';
 import type { SpeedZone } from './lib/geo';
 
 export const colors = {
-  bg: '#0B0C0F',
-  surface: '#16181D',
-  surfaceMuted: '#1F2228',
-  text: '#F2F2F0',
-  textMuted: '#8E9198',
+  bg: '#121316',
+  surface: '#191B20',
+  surfaceMuted: '#22252B',
+  text: '#E7E7E5',
+  textMuted: '#8B8F97',
   border: 'rgba(255,255,255,0.08)',
-  gradientStart: '#EA580C',
-  gradientEnd: '#BE123C',
-  dark: '#0B0C0F',
-  stop: '#DC2626',
+  gradientStart: '#C2410C',
+  gradientEnd: '#9F1239',
+  dark: '#121316',
+  stop: '#B91C1C',
   danger: '#F87171',
 } as const;
 
@@ -37,15 +37,15 @@ export const modeMeta: Record<ActivityMode, { label: string; icon: 'walk' | 'foo
 // Deep, muted jewel tones (not bright/candy) so they read as professional on a
 // near-black background, while still staying distinguishable per mode.
 export const modeGradients: Record<ActivityMode, [string, string]> = {
-  running: ['#EA580C', '#BE123C'],
-  walking: ['#0F766E', '#134E4A'],
-  cycling: ['#1D4ED8', '#1E3A8A'],
+  running: ['#C2410C', '#9F1239'],
+  walking: ['#115E59', '#134E4A'],
+  cycling: ['#1E40AF', '#172554'],
 };
 
 export const modeSolid: Record<ActivityMode, string> = {
-  running: '#EA580C',
-  walking: '#0F766E',
-  cycling: '#3B82F6',
+  running: '#C2410C',
+  walking: '#115E59',
+  cycling: '#2563EB',
 };
 
 export const radii = {
