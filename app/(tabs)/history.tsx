@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useMemo, useState } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
@@ -6,13 +7,23 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SummaryModal from '../../src/components/SummaryModal';
 import { deleteSession, getSessions } from '../../src/lib/storage';
 import { formatDistanceKm, formatDuration, formatPace } from '../../src/lib/geo';
-import { colors, modeMeta, modeSolid, radii, shadow, tabBarClearance } from '../../src/theme';
-import type { RunSession } from '../../src/types';
+import { colors, modeGradients, modeMeta, modeSolid, radii, shadow, tabBarClearance } from '../../src/theme';
+import type { ActivityMode, RunSession } from '../../src/types';
+
+type FilterMode = ActivityMode | 'all';
+
+const FILTERS: { key: FilterMode; label: string }[] = [
+  { key: 'all', label: '전체' },
+  { key: 'running', label: '러닝' },
+  { key: 'walking', label: '산책' },
+  { key: 'cycling', label: '자전거' },
+];
 
 export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
   const [sessions, setSessions] = useState<RunSession[]>([]);
   const [selected, setSelected] = useState<RunSession | null>(null);
+  const [filter, setFilter] = useState<FilterMode>('all');
 
   const load = useCallback(() => {
     getSessions().then(setSessions);
@@ -20,12 +31,17 @@ export default function HistoryScreen() {
 
   useFocusEffect(load);
 
+  const filteredSessions = useMemo(
+    () => (filter === 'all' ? sessions : sessions.filter((s) => s.mode === filter)),
+    [sessions, filter]
+  );
+
   const summary = useMemo(() => {
-    const totalDistance = sessions.reduce((sum, s) => sum + s.distance, 0);
-    const totalDuration = sessions.reduce((sum, s) => sum + s.duration, 0);
+    const totalDistance = filteredSessions.reduce((sum, s) => sum + s.distance, 0);
+    const totalDuration = filteredSessions.reduce((sum, s) => sum + s.duration, 0);
     const avgPace = totalDistance > 0 ? totalDuration / (totalDistance / 1000) : 0;
-    return { totalDistance, count: sessions.length, avgPace };
-  }, [sessions]);
+    return { totalDistance, count: filteredSessions.length, avgPace };
+  }, [filteredSessions]);
 
   const handleDelete = (id: string) => {
     Alert.alert('기록 삭제', '이 기록을 삭제할까요?', [
@@ -45,6 +61,31 @@ export default function HistoryScreen() {
     <View style={[styles.container, { paddingTop: insets.top + 12 }]}>
       <Text style={styles.title}>히스토리</Text>
 
+      <View style={styles.filterRow}>
+        {FILTERS.map((f) => {
+          const active = filter === f.key;
+          const [gStart, gEnd] = f.key === 'all' ? [colors.gradientStart, colors.gradientEnd] : modeGradients[f.key];
+          return (
+            <Pressable key={f.key} onPress={() => setFilter(f.key)} style={styles.filterButton}>
+              {active ? (
+                <LinearGradient
+                  colors={[gStart, gEnd]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.filterButtonFill}
+                >
+                  <Text style={[styles.filterButtonText, styles.filterButtonTextActive]}>{f.label}</Text>
+                </LinearGradient>
+              ) : (
+                <View style={styles.filterButtonFill}>
+                  <Text style={styles.filterButtonText}>{f.label}</Text>
+                </View>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+
       <View style={[styles.summaryRow, shadow]}>
         <SummaryBlock icon="map-outline" label="총 거리 (km)" value={formatDistanceKm(summary.totalDistance)} />
         <View style={styles.summaryDivider} />
@@ -54,13 +95,17 @@ export default function HistoryScreen() {
       </View>
 
       <FlatList
-        data={sessions}
+        data={filteredSessions}
         keyExtractor={(item) => item.id}
         contentContainerStyle={[styles.listContent, { paddingBottom: tabBarClearance }]}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="footsteps-outline" size={32} color={colors.textMuted} />
-            <Text style={styles.emptyText}>아직 기록이 없습니다.{'\n'}홈 탭에서 활동을 시작해보세요.</Text>
+            <Text style={styles.emptyText}>
+              {filter === 'all'
+                ? '아직 기록이 없습니다.\n홈 탭에서 활동을 시작해보세요.'
+                : `${modeMeta[filter].label} 기록이 없습니다.`}
+            </Text>
           </View>
         }
         renderItem={({ item }) => {
@@ -141,6 +186,31 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: colors.text,
     letterSpacing: -0.5,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  filterButton: {
+    flex: 1,
+    borderRadius: radii.pill,
+    overflow: 'hidden',
+  },
+  filterButtonFill: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radii.pill,
+  },
+  filterButtonText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.textMuted,
+  },
+  filterButtonTextActive: {
+    color: '#fff',
   },
   summaryRow: {
     flexDirection: 'row',
