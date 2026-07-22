@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "runner's high",
+    "name": "Runner's High",
     "slug": "runners-high",
     "scheme": "runnershigh",
     "version": "1.0.0",
@@ -27,7 +27,8 @@
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "output": "static"
     },
     "plugins": [
       "expo-router",

@@ -66,7 +66,7 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + 12 }]}>
-      <Text style={styles.title}>runner's high</Text>
+      <Text style={styles.title}>Runner's High</Text>
 
       <View style={styles.modeRow}>
         {MODES.map((m) => {
