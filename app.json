@@ -38,7 +38,8 @@
         }
       ],
       "expo-font",
-      "react-native-maps"
+      "react-native-maps",
+      "expo-secure-store"
     ]
   }
 }
