@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SummaryModal from '../../src/components/SummaryModal';
 import { deleteSession, getSessions } from '../../src/lib/storage';
 import { formatDistanceKm, formatDuration, formatPace } from '../../src/lib/geo';
-import { colors, modeMeta, radii, shadow } from '../../src/theme';
+import { colors, modeMeta, modeSolid, radii, shadow, tabBarClearance } from '../../src/theme';
 import type { RunSession } from '../../src/types';
 
 export default function HistoryScreen() {
@@ -45,25 +45,35 @@ export default function HistoryScreen() {
     <View style={[styles.container, { paddingTop: insets.top + 12 }]}>
       <Text style={styles.title}>히스토리</Text>
 
-      <View style={styles.summaryRow}>
-        <SummaryBlock label="총 거리 (km)" value={formatDistanceKm(summary.totalDistance)} />
-        <SummaryBlock label="횟수" value={String(summary.count)} />
-        <SummaryBlock label="평균 페이스" value={formatPace(summary.avgPace)} />
+      <View style={[styles.summaryRow, shadow]}>
+        <SummaryBlock icon="map-outline" label="총 거리 (km)" value={formatDistanceKm(summary.totalDistance)} />
+        <View style={styles.summaryDivider} />
+        <SummaryBlock icon="flag-outline" label="횟수" value={String(summary.count)} />
+        <View style={styles.summaryDivider} />
+        <SummaryBlock icon="speedometer-outline" label="평균 페이스" value={formatPace(summary.avgPace)} />
       </View>
 
       <FlatList
         data={sessions}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarClearance }]}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>아직 기록이 없습니다. 홈 탭에서 활동을 시작해보세요.</Text>
+          <View style={styles.emptyState}>
+            <Ionicons name="footsteps-outline" size={32} color={colors.textMuted} />
+            <Text style={styles.emptyText}>아직 기록이 없습니다.{'\n'}홈 탭에서 활동을 시작해보세요.</Text>
+          </View>
         }
         renderItem={({ item }) => {
           const meta = modeMeta[item.mode];
+          const accent = modeSolid[item.mode];
           return (
-            <Pressable style={styles.sessionCard} onPress={() => setSelected(item)}>
-              <View style={styles.modeIconWrap}>
-                <Ionicons name={meta.icon} size={20} color={colors.gradientStart} />
+            <Pressable
+              style={({ pressed }) => [styles.sessionCard, shadow, pressed && styles.pressedScale]}
+              onPress={() => setSelected(item)}
+            >
+              <View style={[styles.accentBar, { backgroundColor: accent }]} />
+              <View style={[styles.modeIconWrap, { backgroundColor: `${accent}1F` }]}>
+                <Ionicons name={meta.icon} size={20} color={accent} />
               </View>
               <View style={styles.sessionBody}>
                 <View style={styles.sessionHeader}>
@@ -83,6 +93,7 @@ export default function HistoryScreen() {
                   <Text style={styles.sessionStatText}>{formatPace(item.pace)} /km</Text>
                 </View>
               </View>
+              <Ionicons name="chevron-forward" size={16} color={colors.border} style={styles.chevron} />
               <Pressable
                 onPress={() => handleDelete(item.id)}
                 style={styles.deleteButton}
@@ -100,9 +111,18 @@ export default function HistoryScreen() {
   );
 }
 
-function SummaryBlock({ label, value }: { label: string; value: string }) {
+function SummaryBlock({
+  icon,
+  label,
+  value,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  value: string;
+}) {
   return (
     <View style={styles.summaryBlock}>
+      <Ionicons name={icon} size={15} color={colors.textMuted} style={{ marginBottom: 4 }} />
       <Text style={styles.summaryValue}>{value}</Text>
       <Text style={styles.summaryLabel}>{label}</Text>
     </View>
@@ -116,10 +136,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '800',
     marginBottom: 16,
     color: colors.text,
+    letterSpacing: -0.5,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -127,8 +148,10 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     paddingVertical: 18,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
+  },
+  summaryDivider: {
+    width: StyleSheet.hairlineWidth,
+    backgroundColor: colors.border,
   },
   summaryBlock: {
     flex: 1,
@@ -138,6 +161,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
     color: colors.text,
+    fontVariant: ['tabular-nums'],
   },
   summaryLabel: {
     fontSize: 11,
@@ -147,10 +171,19 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 24,
   },
+  emptyState: {
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 60,
+  },
   emptyText: {
     textAlign: 'center',
     color: colors.textMuted,
-    marginTop: 40,
+    lineHeight: 20,
+  },
+  pressedScale: {
+    transform: [{ scale: 0.98 }],
+    opacity: 0.92,
   },
   sessionCard: {
     flexDirection: 'row',
@@ -158,15 +191,20 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: colors.surface,
     borderRadius: radii.md,
-    padding: 14,
+    paddingVertical: 14,
+    paddingRight: 12,
     marginBottom: 10,
-    ...shadow,
+    overflow: 'hidden',
+  },
+  accentBar: {
+    width: 4,
+    alignSelf: 'stretch',
+    borderRadius: 2,
   },
   modeIconWrap: {
     width: 40,
     height: 40,
     borderRadius: radii.pill,
-    backgroundColor: colors.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -198,6 +236,9 @@ const styles = StyleSheet.create({
   },
   sessionStatDot: {
     color: colors.textMuted,
+  },
+  chevron: {
+    marginRight: 2,
   },
   deleteButton: {
     padding: 6,

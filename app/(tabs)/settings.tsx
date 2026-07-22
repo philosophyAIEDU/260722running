@@ -59,7 +59,9 @@ export default function SettingsScreen() {
 
       <View style={styles.card}>
         <View style={styles.cardHeaderRow}>
-          <Ionicons name="key" size={18} color={colors.gradientStart} />
+          <View style={styles.cardIconWrap}>
+            <Ionicons name="key" size={16} color={colors.gradientStart} />
+          </View>
           <Text style={styles.cardTitle}>Gemini API 키</Text>
         </View>
         <Text style={styles.helperText}>
@@ -103,20 +105,26 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 20 },
-  title: { fontSize: 22, fontWeight: '800', marginBottom: 16, color: colors.text },
+  title: { fontSize: 24, fontWeight: '800', marginBottom: 16, color: colors.text, letterSpacing: -0.5 },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radii.lg,
     padding: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
     ...shadow,
   },
   cardHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
+    gap: 10,
+    marginBottom: 10,
+  },
+  cardIconWrap: {
+    width: 30,
+    height: 30,
+    borderRadius: radii.pill,
+    backgroundColor: 'rgba(255,107,53,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cardTitle: {
     fontSize: 16,

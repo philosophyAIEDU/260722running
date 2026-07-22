@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatDistanceKm, formatDuration, formatPace } from '../lib/geo';
-import { colors, modeMeta, radii, shadow, zoneColors, zoneLabels } from '../theme';
+import { colors, modeGradients, modeMeta, radii, shadow, zoneColors, zoneLabels } from '../theme';
 import type { RunSession } from '../types';
 import RouteMap from './RouteMap';
 
@@ -20,6 +20,7 @@ export default function SummaryModal({
   if (!session) return null;
 
   const meta = modeMeta[session.mode];
+  const [gradientStart, gradientEnd] = modeGradients[session.mode];
   const zones = session.cyclingZones;
   const totalZoneSeconds = zones ? zones.zone1 + zones.zone2 + zones.zone3 : 0;
 
@@ -30,7 +31,7 @@ export default function SummaryModal({
         contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       >
         <LinearGradient
-          colors={[colors.gradientStart, colors.gradientEnd]}
+          colors={[gradientStart, gradientEnd]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.hero}

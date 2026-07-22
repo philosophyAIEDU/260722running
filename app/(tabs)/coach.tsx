@@ -18,7 +18,7 @@ import { getGeminiApiKey } from '../../src/lib/apiKeyStore';
 import { buildContextSummary } from '../../src/lib/coachContext';
 import { askCoach, type ChatMessage } from '../../src/lib/gemini';
 import { getSessions } from '../../src/lib/storage';
-import { colors, radii } from '../../src/theme';
+import { colors, radii, tabBarClearance } from '../../src/theme';
 
 interface Message extends ChatMessage {
   id: string;
@@ -136,7 +136,7 @@ export default function CoachScreen() {
         </View>
       )}
 
-      <View style={[styles.inputRow, { paddingBottom: insets.bottom + 12 }]}>
+      <View style={[styles.inputRow, { paddingBottom: Math.max(insets.bottom + 12, tabBarClearance) }]}>
         <TextInput
           value={input}
           onChangeText={setInput}
@@ -166,10 +166,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '800',
     marginBottom: 12,
     color: colors.text,
+    letterSpacing: -0.5,
   },
   messageList: {
     paddingHorizontal: 20,

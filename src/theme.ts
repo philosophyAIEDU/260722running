@@ -32,10 +32,25 @@ export const modeMeta: Record<ActivityMode, { label: string; icon: 'walk' | 'foo
   cycling: { label: '자전거', icon: 'bicycle' },
 };
 
+// Two-stop gradients used for the mode selector, hero card, and history accents.
+// Both stops per pair are kept mid-to-dark so white text stays legible throughout.
+export const modeGradients: Record<ActivityMode, [string, string]> = {
+  running: ['#FF6B35', '#F72585'],
+  walking: ['#0BA360', '#3CBA92'],
+  cycling: ['#1488CC', '#2B32B2'],
+};
+
+export const modeSolid: Record<ActivityMode, string> = {
+  running: '#FF6B35',
+  walking: '#0BA360',
+  cycling: '#1488CC',
+};
+
 export const radii = {
   sm: 10,
   md: 16,
   lg: 24,
+  xl: 28,
   pill: 999,
 } as const;
 
@@ -45,4 +60,16 @@ export const shadow = {
   shadowOpacity: 0.08,
   shadowRadius: 16,
   elevation: 4,
+} as const;
+
+// Space to reserve at the bottom of scrollable/absolute content so it clears
+// the floating tab bar (68 height + 20 bottom margin + breathing room).
+export const tabBarClearance = 108;
+
+export const shadowLg = {
+  shadowColor: '#171512',
+  shadowOffset: { width: 0, height: 14 },
+  shadowOpacity: 0.16,
+  shadowRadius: 28,
+  elevation: 10,
 } as const;
