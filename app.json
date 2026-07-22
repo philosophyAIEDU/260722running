@@ -37,7 +37,8 @@
           "locationWhenInUsePermission": "러닝/산책/자전거 활동 중 실시간 거리와 경로를 기록하기 위해 위치 정보가 필요합니다."
         }
       ],
-      "expo-font"
+      "expo-font",
+      "react-native-maps"
     ]
   }
 }

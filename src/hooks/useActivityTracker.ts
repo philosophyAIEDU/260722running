@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as Location from 'expo-location';
-import { haversineDistance, MAX_ACCURACY_M, MAX_JUMP_SPEED_MPS } from '../lib/geo';
+import {
+  computeZoneDurations,
+  estimateSteps,
+  haversineDistance,
+  MAX_ACCURACY_M,
+  MAX_JUMP_SPEED_MPS,
+} from '../lib/geo';
 import { generateId } from '../lib/id';
 import type { ActivityMode, Coordinate, RunSession } from '../types';
 
@@ -134,6 +140,9 @@ export function useActivityTracker() {
       averageSpeed,
       coordinates: coordinatesRef.current,
       mode,
+      ...(mode === 'cycling'
+        ? { cyclingZones: computeZoneDurations(coordinatesRef.current, mode) }
+        : { steps: estimateSteps(finalDistance, finalDuration, mode) }),
     };
 
     setStatus('stopped');

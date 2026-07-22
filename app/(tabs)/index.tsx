@@ -1,28 +1,29 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import SummaryModal from '../../src/components/SummaryModal';
 import { useActivityTracker } from '../../src/hooks/useActivityTracker';
-import { saveSession } from '../../src/lib/storage';
 import { formatDistanceKm, formatDuration, formatPace } from '../../src/lib/geo';
-import type { ActivityMode } from '../../src/types';
+import { saveSession } from '../../src/lib/storage';
+import { colors, modeMeta, radii, shadow } from '../../src/theme';
+import type { ActivityMode, RunSession } from '../../src/types';
 
-const MODES: { key: ActivityMode; label: string }[] = [
-  { key: 'running', label: '러닝' },
-  { key: 'walking', label: '산책' },
-  { key: 'cycling', label: '자전거' },
-];
+const MODES: ActivityMode[] = ['running', 'walking', 'cycling'];
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const tracker = useActivityTracker();
   const [selectedMode, setSelectedMode] = useState<ActivityMode>('running');
   const [saving, setSaving] = useState(false);
+  const [summarySession, setSummarySession] = useState<RunSession | null>(null);
 
   const isTracking = tracker.status === 'tracking';
 
   const liveAverageSpeed = useMemo(() => {
     if (tracker.duration === 0) return 0;
-    return (tracker.distance / 1000) / (tracker.duration / 3600);
+    return tracker.distance / 1000 / (tracker.duration / 3600);
   }, [tracker.distance, tracker.duration]);
 
   const livePace = useMemo(() => {
@@ -33,7 +34,7 @@ export default function HomeScreen() {
   const handleStart = async () => {
     try {
       await tracker.start(selectedMode);
-    } catch (err) {
+    } catch {
       Alert.alert(
         '위치 권한 필요',
         '거리를 기록하려면 위치 권한을 허용해주세요. 설정에서 권한을 변경할 수 있습니다.'
@@ -54,8 +55,8 @@ export default function HomeScreen() {
     setSaving(true);
     try {
       await saveSession(session);
-      Alert.alert('저장 완료', '히스토리 탭에서 기록을 확인할 수 있습니다.');
-    } catch (err) {
+      setSummarySession(session);
+    } catch {
       Alert.alert('저장 실패', '기록을 저장하는 중 문제가 발생했습니다.');
     } finally {
       setSaving(false);
@@ -64,36 +65,55 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 16 }]}>
+    <View style={[styles.container, { paddingTop: insets.top + 12 }]}>
       <Text style={styles.title}>runner's high</Text>
 
       <View style={styles.modeRow}>
-        {MODES.map((m) => (
-          <Pressable
-            key={m.key}
-            disabled={isTracking}
-            onPress={() => setSelectedMode(m.key)}
-            style={[
-              styles.modeButton,
-              selectedMode === m.key && styles.modeButtonActive,
-              isTracking && styles.modeButtonDisabled,
-            ]}
-          >
-            <Text
-              style={[
-                styles.modeButtonText,
-                selectedMode === m.key && styles.modeButtonTextActive,
-              ]}
+        {MODES.map((m) => {
+          const meta = modeMeta[m];
+          const active = selectedMode === m;
+          return (
+            <Pressable
+              key={m}
+              disabled={isTracking}
+              onPress={() => setSelectedMode(m)}
+              style={[styles.modeButton, isTracking && styles.modeButtonDisabled]}
             >
-              {m.label}
-            </Text>
-          </Pressable>
-        ))}
+              {active ? (
+                <LinearGradient
+                  colors={[colors.gradientStart, colors.gradientEnd]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.modeButtonFill}
+                >
+                  <Ionicons name={meta.icon} size={18} color="#fff" />
+                  <Text style={[styles.modeButtonText, styles.modeButtonTextActive]}>
+                    {meta.label}
+                  </Text>
+                </LinearGradient>
+              ) : (
+                <View style={styles.modeButtonFill}>
+                  <Ionicons name={meta.icon} size={18} color={colors.textMuted} />
+                  <Text style={styles.modeButtonText}>{meta.label}</Text>
+                </View>
+              )}
+            </Pressable>
+          );
+        })}
       </View>
 
+      <LinearGradient
+        colors={[colors.gradientStart, colors.gradientEnd]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.hero}
+      >
+        <Text style={styles.heroValue}>{formatDistanceKm(tracker.distance)}</Text>
+        <Text style={styles.heroUnit}>km</Text>
+        <Text style={styles.heroDuration}>{formatDuration(tracker.duration)}</Text>
+      </LinearGradient>
+
       <View style={styles.statsGrid}>
-        <StatBlock label="거리 (km)" value={formatDistanceKm(tracker.distance)} big />
-        <StatBlock label="시간" value={formatDuration(tracker.duration)} big />
         <StatBlock label="페이스 (분/km)" value={formatPace(livePace)} />
         <StatBlock label="평균 속도 (km/h)" value={liveAverageSpeed.toFixed(1)} />
         <StatBlock label="현재 속도 (km/h)" value={tracker.currentSpeed.toFixed(1)} />
@@ -104,18 +124,31 @@ export default function HomeScreen() {
           <Text style={styles.actionButtonText}>{saving ? '저장 중...' : '종료'}</Text>
         </Pressable>
       ) : (
-        <Pressable style={[styles.actionButton, styles.startButton]} onPress={handleStart}>
-          <Text style={styles.actionButtonText}>시작</Text>
+        <Pressable onPress={handleStart} style={styles.startButtonWrapper}>
+          <LinearGradient
+            colors={[colors.gradientStart, colors.gradientEnd]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.actionButton}
+          >
+            <Text style={styles.actionButtonText}>시작</Text>
+          </LinearGradient>
         </Pressable>
       )}
+
+      <SummaryModal
+        visible={summarySession != null}
+        session={summarySession}
+        onClose={() => setSummarySession(null)}
+      />
     </View>
   );
 }
 
-function StatBlock({ label, value, big }: { label: string; value: string; big?: boolean }) {
+function StatBlock({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.statBlock}>
-      <Text style={big ? styles.statValueBig : styles.statValue}>{value}</Text>
+      <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
@@ -124,79 +157,108 @@ function StatBlock({ label, value, big }: { label: string; value: string; big?: 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.bg,
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 20,
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 16,
+    color: colors.text,
   },
   modeRow: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   modeButton: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
-    backgroundColor: '#F2F2F2',
-    alignItems: 'center',
-  },
-  modeButtonActive: {
-    backgroundColor: '#FF6B35',
+    borderRadius: radii.pill,
+    overflow: 'hidden',
   },
   modeButtonDisabled: {
     opacity: 0.5,
   },
+  modeButtonFill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    backgroundColor: colors.surfaceMuted,
+  },
   modeButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#444',
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.textMuted,
   },
   modeButtonTextActive: {
     color: '#fff',
   },
+  hero: {
+    borderRadius: radii.lg,
+    paddingVertical: 28,
+    alignItems: 'center',
+    marginBottom: 16,
+    ...shadow,
+  },
+  heroValue: {
+    fontSize: 56,
+    fontWeight: '800',
+    color: '#fff',
+    lineHeight: 60,
+  },
+  heroUnit: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.85)',
+    marginBottom: 12,
+  },
+  heroDuration: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.95)',
+  },
   statsGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 32,
+    gap: 10,
+    marginBottom: 24,
   },
   statBlock: {
-    width: '47%',
-    backgroundColor: '#F8F8F8',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    paddingVertical: 14,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   statValue: {
-    fontSize: 22,
-    fontWeight: '700',
-  },
-  statValueBig: {
-    fontSize: 32,
+    fontSize: 18,
     fontWeight: '800',
+    color: colors.text,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#888',
+    fontSize: 11,
+    color: colors.textMuted,
     marginTop: 4,
+    textAlign: 'center',
+  },
+  startButtonWrapper: {
+    marginTop: 'auto',
+    marginBottom: 24,
+    borderRadius: radii.lg,
+    overflow: 'hidden',
   },
   actionButton: {
     paddingVertical: 18,
-    borderRadius: 16,
+    borderRadius: radii.lg,
     alignItems: 'center',
-    marginTop: 'auto',
-    marginBottom: 24,
-  },
-  startButton: {
-    backgroundColor: '#FF6B35',
   },
   stopButton: {
-    backgroundColor: '#333',
+    backgroundColor: colors.dark,
+    marginTop: 'auto',
+    marginBottom: 24,
   },
   actionButtonText: {
     color: '#fff',
