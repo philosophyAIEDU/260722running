@@ -178,6 +178,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radii.lg,
     padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
     ...shadow,
   },
   cardTitle: {

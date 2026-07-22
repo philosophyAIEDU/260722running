@@ -110,6 +110,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radii.lg,
     padding: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
     ...shadow,
   },
   cardHeaderRow: {
@@ -122,7 +124,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: radii.pill,
-    backgroundColor: 'rgba(255,107,53,0.14)',
+    backgroundColor: 'rgba(234,88,12,0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },

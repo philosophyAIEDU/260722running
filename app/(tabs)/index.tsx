@@ -307,6 +307,8 @@ const styles = StyleSheet.create({
     borderRadius: radii.md,
     paddingVertical: 14,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
     ...shadow,
   },
   statIcon: {
@@ -339,7 +341,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
   },
   stopButton: {
-    backgroundColor: colors.dark,
+    backgroundColor: colors.stop,
     marginTop: 'auto',
     marginBottom: tabBarClearance,
   },

@@ -29,6 +29,7 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
+        headerShown: false,
         tabBarActiveTintColor: colors.gradientStart,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarShowLabel: true,
@@ -38,7 +39,7 @@ export default function TabsLayout() {
         tabBarBackground: () => (
           <BlurView
             intensity={Platform.OS === 'ios' ? 60 : 100}
-            tint="light"
+            tint="dark"
             style={StyleSheet.absoluteFill}
           />
         ),
@@ -89,11 +90,13 @@ const styles = StyleSheet.create({
     height: 68,
     borderRadius: radii.xl,
     borderTopWidth: 0,
-    backgroundColor: 'rgba(255,255,255,0.72)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(22,24,29,0.75)',
     overflow: 'hidden',
-    shadowColor: '#171512',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.14,
+    shadowOpacity: 0.4,
     shadowRadius: 24,
     elevation: 12,
   },
@@ -112,6 +115,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconWrapActive: {
-    backgroundColor: 'rgba(255,107,53,0.14)',
+    backgroundColor: 'rgba(234,88,12,0.18)',
   },
 });

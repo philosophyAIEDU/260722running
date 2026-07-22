@@ -10,7 +10,7 @@ export default function RootLayout() {
       <Head>
         <title>Runner's High</title>
       </Head>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
     </SafeAreaProvider>
   );

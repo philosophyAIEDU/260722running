@@ -93,7 +93,7 @@ export default function HistoryScreen() {
                   <Text style={styles.sessionStatText}>{formatPace(item.pace)} /km</Text>
                 </View>
               </View>
-              <Ionicons name="chevron-forward" size={16} color={colors.border} style={styles.chevron} />
+              <Ionicons name="chevron-forward" size={16} color={colors.textMuted} style={styles.chevron} />
               <Pressable
                 onPress={() => handleDelete(item.id)}
                 style={styles.deleteButton}
@@ -148,6 +148,8 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     paddingVertical: 18,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   summaryDivider: {
     width: StyleSheet.hairlineWidth,
@@ -195,6 +197,8 @@ const styles = StyleSheet.create({
     paddingRight: 12,
     marginBottom: 10,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   accentBar: {
     width: 4,
